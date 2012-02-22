@@ -29,7 +29,7 @@ class region_finder:
         self.prospects = []
         
     def process(self):
-        for i in range(len(self.seq) - self.region.length):
+        for i in range(200, len(self.seq) - self.region.length):
             #print(self.seq[i:i + self.region.length])
             self.prospects.append(candidate(self.seq[i:i + self.region.length], self.region, (i,i + self.region.length)))
 
@@ -50,7 +50,7 @@ class lf:
         return "Score: " + str(self.score) + "\n" + self.seq + "\n" + aln
  
 beta1 = regiondef('beta1', 10, [3],[0, 1, 5], [2, 8])
-alpha1 = regiondef('alpha1', 19, [3, 7, 10, 11, 14, 18], [17], [])
+alpha1 = regiondef('alpha1', 19, [0, 4, 7, 10, 11, 14, 18], [17], [])
 beta2 = regiondef('beta2', 10, [2, 4, 6], [],[1])
 beta3 = regiondef('beta3', 10, [],[5], [4,8])
 alpha2 = regiondef('alpha2', 15,[4, 5, 7, 8, 11, 12], [], [14])

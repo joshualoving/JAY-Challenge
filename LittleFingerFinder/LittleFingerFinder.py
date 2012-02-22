@@ -6,11 +6,11 @@ lfs = []
 
 def filterer(stuff):
     s = stuff[0].score()
-    if background[r.name][round(s)]/float(background[stuff[1].name]['total']) > 0.05:
+    if background[r.name][round(s)]/float(background[stuff[1].name]['total']) > 0.10:
         return False
     return True
 background = background_finder()
-for record in SeqIO.parse(open("superfam/ecoli.txt", "r"), "fasta"):
+for record in SeqIO.parse(open("../../../../Dropbox/JAY/superfam/ecoli.txt", "r"), "fasta"):
     candidates = {}
     for r in regiondefs:
         #print(str(record.seq))
