@@ -34,7 +34,7 @@ class region_finder:
             self.prospects.append(candidate(self.seq[i:i + self.region.length], self.region, (i,i + self.region.length)))
 
 class lf:
-    def __init__(self, seq, beta1, alpha1, beta2, beta3, alpha2, beta4, score):
+    def __init__(self, seq, beta1, alpha1, beta2, beta3, alpha2, beta4, betaclamp, score):
         self.seq = seq
         self.beta1 = beta1
         self.alpha1 = alpha1
@@ -42,10 +42,11 @@ class lf:
         self.beta3 = beta3
         self.alpha2 = alpha2
         self.beta4 = beta4
+        self.betaclamp = betaclamp
         self.score = score
     def __str__(self):
         aln = len(self.seq)*'-'
-        for reg in [self.beta1, self.beta2, self.beta3, self.beta4, self.alpha1, self.alpha2]:
+        for reg in [self.beta1, self.beta2, self.beta3, self.beta4, self.alpha1, self.alpha2, self.betaclamp]:
             aln = aln[:reg.delim[0]] + reg.seq + aln[reg.delim[1]:]
         return "Score: " + str(self.score) + "\n" + self.seq + "\n" + aln
  
@@ -55,4 +56,5 @@ beta2 = regiondef('beta2', 10, [2, 4, 6], [],[1])
 beta3 = regiondef('beta3', 10, [],[5], [4,8])
 alpha2 = regiondef('alpha2', 15,[4, 5, 7, 8, 11, 12], [], [14])
 beta4 = regiondef('beta4', 11, [2, 4, 6], [0, 1, 5, 8], [])
-regiondefs = [beta1, alpha1, beta2, beta3, alpha2, beta4]
+betaclamp = regiondef('betaclamp', 5,[1,2,3,4], red=[0], pink=[]) 
+regiondefs = [beta1, alpha1, beta2, beta3, alpha2, beta4, betaclamp]

@@ -3,7 +3,7 @@ from RegionDef import *
 
 def background_finder():
     from Bio import SeqIO
-    grouped = {'alpha1': {}, 'alpha2': {}, 'beta1': {}, 'beta2': {}, 'beta3': {}, 'beta4': {}}
+    grouped = {'alpha1': {}, 'alpha2': {}, 'beta1': {}, 'beta2': {}, 'beta3': {}, 'beta4': {}, 'betaclamp':{}}
 
     for record in SeqIO.parse(open("../../../../Dropbox/JAY/superfam/aggregate_filtered.fasta", "r"), "fasta"):
         candidates = {}
@@ -11,6 +11,11 @@ def background_finder():
             #print(str(record.seq))
             candidates[r] = region_finder(r, str(record.seq))
             candidates[r].process()
+        for bc in candidates[betaclamp].prospects:
+            try:
+                grouped['betaclamp'][bc.score()] += 1
+            except:
+                grouped['betaclamp'][bc.score()] = 1
         for b4 in candidates[beta4].prospects:
             try:
                 grouped['beta4'][b4.score()] += 1
