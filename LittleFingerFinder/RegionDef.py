@@ -32,7 +32,10 @@ class region_finder:
         for i in range(200, len(self.seq) - self.region.length):
             #print(self.seq[i:i + self.region.length])
             self.prospects.append(candidate(self.seq[i:i + self.region.length], self.region, (i,i + self.region.length)))
-
+    def sample(self):
+        from random import randint
+        return [self.prospects[randint(len(self.prospects))]for i in self.prospects]
+            
 class lf:
     def __init__(self, seq, beta1, alpha1, beta2, beta3, alpha2, beta4, betaclamp, score):
         self.seq = seq

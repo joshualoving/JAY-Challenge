@@ -11,7 +11,7 @@ def filterer(stuff):
     return True
 number = input("Please input the number of little fingers to find")
 background = background_finder()
-for record in SeqIO.parse(open("../../../../Dropbox/JAY/superfam/ecoli.txt", "r"), "fasta"):
+for record in SeqIO.parse(open("../../../../Dropbox/JAY/superfam/ecoli.txt", r""), "fasta"):
     candidates = {}
     for r in regiondefs:
         #print(str(record.seq))
@@ -20,16 +20,12 @@ for record in SeqIO.parse(open("../../../../Dropbox/JAY/superfam/ecoli.txt", "r"
         print(len(candidates[r].prospects))
         candidates[r].prospects = [e[0] for e in filter(filterer, [(c, r) for c in candidates[r].prospects])]
         print(len(candidates[r].prospects))
-    ordering = [beta4, alpha2, beta3, beta2, alpha1, beta1]
+    ordering = [betaclamp, beta4, alpha2, beta3, beta2, alpha1, beta1]
     traceback = [[] for i in range(number)]
-    bcs = [(bc.score(), bc) for bc in candidates[betaclamp].prospects].sort()
     for path in traceback:
-        path.append(bcs.pop())
-    del bcs
-            
-    for i in range(number):
-        for path in traceback:
-            
+        for reg in ordering:
+            path.append(max([(bc.score(), bc) for bc in candidates[region].sample()]))
+     
     for bc in candidates[betaclamp].prospects:
         for b4 in candidates[beta4].prospects:
             if b4.delim[1] > bc.delim[0]:
