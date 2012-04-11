@@ -1,5 +1,5 @@
 from RegionDef import *
-
+import pylab as pl
 from BackgroundFinder import background_finder                               
 from Bio import SeqIO
 lfs = []
@@ -11,45 +11,43 @@ def filterer(stuff):
     return True
 number = input("Please input the number of little fingers to find")
 background = background_finder()
-for record in SeqIO.parse(open("../../../../Dropbox/JAY/superfam/ecoli.txt", r""), "fasta"):
+# the histogram of the data with histtype='step'
+outregs = open("top20.csv", 'w')
+for record in SeqIO.parse(open("../../../../Dropbox/JAY/superfam/ecoli.txt", "r"), "fasta"):
     candidates = {}
     for r in regiondefs:
         #print(str(record.seq))
         candidates[r] = region_finder(r, str(record.seq))
         candidates[r].process()
-        print(len(candidates[r].prospects))
+        outregs.write(r.name)
+        outregs.write(", \t")
+        for c in candidates[r].top20():
+            outregs.write(str(c))
+            outregs.write(",\t")
+        outregs.write("\n")
+        #print(len(candidates[r].prospects))
         candidates[r].prospects = [e[0] for e in filter(filterer, [(c, r) for c in candidates[r].prospects])]
-        print(len(candidates[r].prospects))
-    ordering = [betaclamp, beta4, alpha2, beta3, beta2, alpha1, beta1]
+        #print(len(candidates[r].prospects))
+        
+    ordering = [beta4, alpha2, beta3, beta2, alpha1, beta1]
     traceback = [[] for i in range(number)]
     for path in traceback:
-        for reg in ordering:
-            path.append(max([(bc.score(), bc) for bc in candidates[region].sample()]))
-     
-    for bc in candidates[betaclamp].prospects:
-        for b4 in candidates[beta4].prospects:
-            if b4.delim[1] > bc.delim[0]:
-                break
-            for a2 in candidates[alpha2].prospects:
-                if a2.delim[1] > b4.delim[0]:# or (b4.delim[0] - a2.delim[1]) > 30:
-                    break
-                for b3 in candidates[beta3].prospects:
-                    if b3.delim[1] > a2.delim[0]:# or (a2.delim[0] - b3.delim[1]) > 30:
-                        break
-                    for b2 in candidates[beta2].prospects:
-                        if b2.delim[1] > b3.delim[0]:# or (b3.delim[0] - b2.delim[1]) > 30:
-                            break
-                        for a1 in candidates[alpha1].prospects:
-                            if a1.delim[1] > b2.delim[0]:# or (b2.delim[0] - a1.delim[1]) > 30:
-                                break
-                            for b1 in candidates[beta1].prospects:
-                                if b1.delim[1] > a1.delim[0]:# or (a1.delim[0] - b1.delim[1]) > 30:
-                                   break
-                                lfs.append(lf(candidates[r].seq, b1, a1, b2, b3, a2, b4, bc, b1.score() + a1.score() + b2.score() + b3.score() + a2.score() + b4.score() + bc.score()))
-
-print(len(lfs))
-cool = sorted([(l.score, l) for l in lfs])
-cool.reverse()
-
-print(str(cool[0][1]))
-print(str(cool[1][1]))
+        path.extend([[c] for c in candidates[betaclamp].sample(len(str(record.seq)))])
+    
+    for reg in ordering:
+        for path in traceback:
+            for p in path:
+                #print str(p[-1].delim[0])
+                
+                p.append(max([(bc.score() - 0.05*(p[-1].delim[0] - bc.delim[1]), bc) for bc in candidates[reg].sample(p[-1].delim[0]-2)])[1])
+    for path in traceback:
+        score, select = max([(sum([r.score() for r in p]), p) for p in path])
+        print select[6].seq, select[5].seq, select[4].seq, select[3].seq, select[2].seq, select[1].seq, select[0].seq
+        lfs.append(lf(str(record.seq), select[6], select[5], select[4], select[3], select[2], select[1], select[0], score))
+outhtml = open("lf.html", "w")
+outhtml.write("<html><body>")
+for l in lfs:
+    print str(l)
+    outhtml.write(l.html())
+    outhtml.write("<p>")
+outhtml.write("</html></body>")
